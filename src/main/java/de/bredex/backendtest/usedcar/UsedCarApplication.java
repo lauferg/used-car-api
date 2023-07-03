@@ -2,12 +2,14 @@ package de.bredex.backendtest.usedcar;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-public class UsedcarApplication {
+@EnableJpaRepositories
+public class UsedCarApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(UsedcarApplication.class, args);
+		SpringApplication.run(UsedCarApplication.class, args);
 	}
 
 }

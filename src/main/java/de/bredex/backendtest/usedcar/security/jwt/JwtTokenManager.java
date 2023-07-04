@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -21,12 +23,15 @@ public class JwtTokenManager {
     private final JwtProperties jwtProperties;
 
     public String issueToken(ApplicationUser applicationUser, Map<String, Object> extraClaims) {
+        Map<String, Object> claims = new HashMap<>(extraClaims);
+        claims.put("issued-to", applicationUser.getName());
+        claims.put("fingerprint", UUID.randomUUID());
         return Jwts
                 .builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpirationTimeMillis()))
                 .setSubject(applicationUser.getName())
-                .setClaims(extraClaims)
+                .setClaims(claims)
                 .signWith(generateSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

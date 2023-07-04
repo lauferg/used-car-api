@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UsedCarUserDetailService implements UserDetailsService {
 
-    private final ApplicationUserRepository userRepository;
+    private final ApplicationUserRepository applicationUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUser applicationUser = userRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        ApplicationUser applicationUser = applicationUserRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException("User not found."));
         return transformIntoUserDetails(applicationUser);
     }
 

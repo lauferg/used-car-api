@@ -2,6 +2,9 @@ package de.bredex.backendtest.usedcar.security.jwt;
 
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUserRepository;
+import de.bredex.backendtest.usedcar.security.jwt.util.JwtTokenUtil;
+import de.bredex.backendtest.usedcar.security.jwt.validation.BlacklistedValidator;
+import de.bredex.backendtest.usedcar.security.jwt.validation.JwtValidationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,12 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtTokenManager tokenManager;
+    private final JwtTokenManager jwtTokenManager;
+    private final JwtTokenUtil jwtTokenUtil;
     private final ApplicationUserRepository applicationUserRepository;
 
     @Override
@@ -39,14 +44,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void executeFilterActions(HttpServletRequest request, HttpServletResponse response) {
         final String jwt = request.getHeader("Authorization").substring(7);
-        final String tokenUserName = tokenManager.extractTokenUserName(jwt);
+        final String tokenUserName = jwtTokenUtil.extractTokenUserName(jwt);
 
-        if (StringUtils.hasText(tokenUserName) && SecurityContextHolder.getContext().getAuthentication() == null) {
+        /*
+            Check if token is valid. If it is, then update security context.
+            If the token is invalid for any other reason than being blacklisted then blacklist it.
+         */
+        if (StringUtils.hasText(tokenUserName)) {
             String principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ApplicationUser applicationUser = applicationUserRepository.findById(principal).orElseThrow();
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(applicationUser.getName(), applicationUser.getEmail(), Collections.emptyList());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            List<JwtValidationResult> jwtValidationResults = jwtTokenManager.validateToken(jwt, applicationUser);
+
+            if (jwtValidationResults.stream().allMatch(JwtValidationResult::isTokenValid)) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        applicationUser.getEmail(),
+                        applicationUser.getName(),
+                        Collections.emptyList());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else if (jwtValidationResults.stream().anyMatch(result -> result.getValidatorClass() == BlacklistedValidator.class && !result.isTokenValid())) {
+                jwtTokenManager.blacklistToken(jwt);
+                SecurityContextHolder.clearContext();
+            }
+            else {
+                SecurityContextHolder.clearContext();
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ package de.bredex.backendtest.usedcar.security.configuration;
 
 
 import de.bredex.backendtest.usedcar.security.jwt.JwtAuthFilter;
-import de.bredex.backendtest.usedcar.security.jwt.UsedCarUserDetailService;
+import de.bredex.backendtest.usedcar.security.userdetails.UsedCarUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -92,7 +92,8 @@ public class SecurityConfiguration {
                         "/proxy/**",
                         "/configuration/**",
                         "/swagger-resources/**",
-                        "/webjars/**"
+                        "/webjars/**",
+                        "/h2-console/**"
                 );
     }
 }

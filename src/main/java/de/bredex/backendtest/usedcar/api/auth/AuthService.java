@@ -22,8 +22,8 @@ public class AuthService {
         final String userEmail = authRequest.getEmail();
         final String userName = authRequest.getName();
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userName,
                 userEmail,
+                userName,
                 Collections.emptyList()
         );
 

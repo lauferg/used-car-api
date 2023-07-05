@@ -1,4 +1,4 @@
-package de.bredex.backendtest.usedcar.security.jwt;
+package de.bredex.backendtest.usedcar.security.userdetails;
 
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUserRepository;
@@ -24,8 +24,8 @@ public class UsedCarUserDetailService implements UserDetailsService {
     private UserDetails transformIntoUserDetails(ApplicationUser applicationUser) {
         return User
                 .builder()
-                .username(applicationUser.getName())
-                .password(applicationUser.getEmail())
+                .username(applicationUser.getEmail())
+                .password(applicationUser.getName())
                 .roles("USER")
                 .build();
     }

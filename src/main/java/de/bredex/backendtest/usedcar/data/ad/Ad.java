@@ -2,7 +2,6 @@ package de.bredex.backendtest.usedcar.data.ad;
 
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;

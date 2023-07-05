@@ -54,7 +54,7 @@ public class SecurityConfiguration {
 
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
 
                 .and()
                 .authenticationProvider(authenticationProvider())

@@ -16,7 +16,7 @@ public class ExpiredValidator implements JwtValidator {
 
     @Override
     public JwtValidationResult validateToken(String token, ApplicationUser applicationUser) {
-        final Date expirationDate = jwtTokenUtil.extractClaim(token, Claims::getExpiration);
+        final Date expirationDate = jwtTokenUtil.extractClaim(token, claims -> claims.get("expiration", Date.class));
         final Date currentDate = new Date(System.currentTimeMillis());
         boolean tokenValid = expirationDate.after(currentDate);
         return new JwtValidationResult(ExpiredValidator.class, tokenValid);

@@ -17,8 +17,8 @@ public class JwtTokenUtil {
 
     private final JwtProperties jwtProperties;
 
-    public String extractTokenUserName(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String extractTokenOwnerId(String token) {
+        return extractClaim(token, claims -> claims.get("issued-to", String.class));
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimExtractor) {

@@ -13,5 +13,5 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 jwt:
-  secret: 2Dnb8LD76jhrvtsu1kMAp9mjUNVR69ogWcrJHEHRWb0;
-  expiration-time-millis: 10_000
+  secret: 02e05d259ad1b09149f0f47814b076a82a7f62bcad83372ba36c45caff1eb227
+  expiration-time-millis: 620_000

@@ -3,14 +3,16 @@ package de.bredex.backendtest.usedcar.security.jwt;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import de.bredex.backendtest.usedcar.data.jwttoken.JwtToken;
 import de.bredex.backendtest.usedcar.data.jwttoken.JwtTokenRepository;
+import de.bredex.backendtest.usedcar.security.jwt.util.JwtTokenUtil;
 import de.bredex.backendtest.usedcar.security.jwt.validation.JwtValidationResult;
 import de.bredex.backendtest.usedcar.security.jwt.validation.JwtValidator;
-import de.bredex.backendtest.usedcar.security.jwt.util.JwtTokenUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,14 @@ public class JwtTokenManager {
 
     }
 
+    public void blacklistToken(ApplicationUser applicationUser) {
+        final JwtToken token = jwtTokenRepository
+                .findByApplicationUser(applicationUser)
+                .orElseThrow();
+        token.setBlacklisted(true);
+        jwtTokenRepository.save(token);
+    }
+
     public void blacklistToken(String jwt) {
         jwtTokenRepository
                 .findById(jwt)
@@ -54,15 +64,16 @@ public class JwtTokenManager {
 
     private JwtToken issueNewToken(ApplicationUser applicationUser, Map<String, Object> extraClaims) {
         Map<String, Object> claims = new HashMap<>(extraClaims);
-        claims.put("issued-to", applicationUser.getName());
+        Instant now = Instant.now();
+        Instant expiration = now.plus(jwtProperties.getExpirationTimeMillis(), ChronoUnit.MILLIS);
+        claims.put("issued-to", applicationUser.getEmail());
+        claims.put("issued-at", Date.from(now));
+        claims.put("expiration", Date.from(expiration));
         claims.put("fingerprint", UUID.randomUUID());
         Date expirationTime = new Date(System.currentTimeMillis() + jwtProperties.getExpirationTimeMillis());
 
         final String jwt =  Jwts
                 .builder()
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(expirationTime)
-                .setSubject(applicationUser.getName())
                 .setClaims(claims)
                 .signWith(jwtTokenUtil.generateSigningKey(), SignatureAlgorithm.HS256)
                 .compact();

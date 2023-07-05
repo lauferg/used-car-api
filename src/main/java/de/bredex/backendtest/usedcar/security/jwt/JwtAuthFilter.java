@@ -3,6 +3,7 @@ package de.bredex.backendtest.usedcar.security.jwt;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUserRepository;
 import de.bredex.backendtest.usedcar.security.jwt.util.JwtTokenUtil;
+import de.bredex.backendtest.usedcar.security.jwt.validation.AssignedToUserValidator;
 import de.bredex.backendtest.usedcar.security.jwt.validation.BlacklistedValidator;
 import de.bredex.backendtest.usedcar.security.jwt.validation.JwtValidationResult;
 import lombok.RequiredArgsConstructor;
@@ -44,15 +45,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void executeFilterActions(HttpServletRequest request, HttpServletResponse response) {
         final String jwt = request.getHeader("Authorization").substring(7);
-        final String tokenUserName = jwtTokenUtil.extractTokenUserName(jwt);
+        final String tokenUserId = jwtTokenUtil.extractTokenOwnerId(jwt);
 
-        /*
-            Check if token is valid. If it is, then update security context.
-            If the token is invalid for any other reason than being blacklisted then blacklist it.
-         */
-        if (StringUtils.hasText(tokenUserName)) {
-            String principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            ApplicationUser applicationUser = applicationUserRepository.findById(principal).orElseThrow();
+        if (StringUtils.hasText(tokenUserId) && SecurityContextHolder.getContext().getAuthentication() == null) {
+            ApplicationUser applicationUser = applicationUserRepository.findById(tokenUserId).orElseThrow();
             List<JwtValidationResult> jwtValidationResults = jwtTokenManager.validateToken(jwt, applicationUser);
 
             if (jwtValidationResults.stream().allMatch(JwtValidationResult::isTokenValid)) {
@@ -62,13 +58,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         Collections.emptyList());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else if (jwtValidationResults.stream().anyMatch(result -> result.getValidatorClass() == BlacklistedValidator.class && !result.isTokenValid())) {
-                jwtTokenManager.blacklistToken(jwt);
-                SecurityContextHolder.clearContext();
-            }
-            else {
-                SecurityContextHolder.clearContext();
+            } else {
+                if ((!isTokenToBeBlacklisted(jwtValidationResults))) {
+                    jwtTokenManager.blacklistToken(jwt);
+                    SecurityContextHolder.clearContext();
+                } else {
+                    SecurityContextHolder.clearContext();
+                }
             }
         }
+    }
+
+    private boolean isTokenToBeBlacklisted(List<JwtValidationResult> jwtValidationResults) {
+        return jwtValidationResults
+                .stream()
+                .anyMatch(result -> result.getValidatorClass() == AssignedToUserValidator.class && result.isTokenValid())
+
+                &&
+
+                jwtValidationResults
+                        .stream()
+                        .anyMatch(result -> result.getValidatorClass() == BlacklistedValidator.class && result.isTokenValid());
     }
 }

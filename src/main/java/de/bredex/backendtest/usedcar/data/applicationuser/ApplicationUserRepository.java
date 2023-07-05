@@ -8,4 +8,8 @@ public interface ApplicationUserRepository extends JpaRepository<ApplicationUser
 
     @Override
     Optional<ApplicationUser> findById(String email);
+
+    Optional<ApplicationUser> findByEmailAndName(String email, String name);
+
+    Optional<ApplicationUser> findByName(String name);
 }

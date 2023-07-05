@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS ad
     description            VARCHAR(200),
     price                  BIGINT      NOT NULL,
 
-    CONSTRAINT fk_application_user_email FOREIGN KEY (application_user_email) REFERENCES APPLICATION_USER (EMAIL)
+    CONSTRAINT fk_ad_application_user FOREIGN KEY (application_user_email) REFERENCES APPLICATION_USER (EMAIL)
 );

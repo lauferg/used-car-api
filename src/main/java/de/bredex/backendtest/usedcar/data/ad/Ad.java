@@ -1,9 +1,9 @@
 package de.bredex.backendtest.usedcar.data.ad;
 
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Lazy;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,10 +15,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "ad")
-@NoArgsConstructor
 public class Ad {
 
     @Id

@@ -1,4 +1,4 @@
-package de.bredex.backendtest.usedcar.api.auth;
+package de.bredex.backendtest.usedcar.api.auth.response;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,5 +1,6 @@
 package de.bredex.backendtest.usedcar.api.auth;
 
+import de.bredex.backendtest.usedcar.api.auth.request.AuthRequest;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUser;
 import de.bredex.backendtest.usedcar.data.applicationuser.ApplicationUserRepository;
 import de.bredex.backendtest.usedcar.security.jwt.JwtTokenManager;
@@ -20,7 +21,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final ApplicationUserRepository applicationUserRepository;
 
-    public AuthResponse login(AuthRequest authRequest) {
+    public String login(AuthRequest authRequest) {
         final String userEmail = authRequest.getEmail();
         final String userName = authRequest.getName();
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -32,23 +33,15 @@ public class AuthService {
         authenticationManager.authenticate(authToken);
 
         ApplicationUser applicationUser = applicationUserRepository.findByEmailAndName(userEmail, userName).orElseThrow();
-        final String jwt = jwtTokenManager.issueToken(applicationUser, Collections.emptyMap());
-        return AuthResponse
-                .builder()
-                .token(jwt)
-                .build();
+        return jwtTokenManager.issueToken(applicationUser, Collections.emptyMap());
     }
 
-    public AuthResponse register(AuthRequest authRequest) {
+    public String register(AuthRequest authRequest) {
         ApplicationUser newUser = new ApplicationUser();
         newUser.setEmail(authRequest.getEmail());
         newUser.setName(authRequest.getName());
         applicationUserRepository.save(newUser);
-        final String jwt = jwtTokenManager.issueToken(newUser, Collections.emptyMap());
-        return AuthResponse
-                .builder()
-                .token(jwt)
-                .build();
+        return jwtTokenManager.issueToken(newUser, Collections.emptyMap());
     }
 
     public void logout(Authentication authentication) {

@@ -41,14 +41,8 @@ public class SecurityConfiguration {
                         "/ad/search"
                 )
                 .permitAll()
-
-                .and()
-                .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/ad/{id}")
                 .permitAll()
-
-                .and()
-                .authorizeRequests()
                 .anyRequest()
                 .authenticated()
 

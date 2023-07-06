@@ -1,5 +1,7 @@
 package de.bredex.backendtest.usedcar.api.auth;
 
+import de.bredex.backendtest.usedcar.api.auth.request.AuthRequest;
+import de.bredex.backendtest.usedcar.api.auth.response.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,15 +23,23 @@ public class AuthController {
 
     @Operation(summary = "User registration.")
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> signup(@RequestBody AuthRequest authRequest) {
-        AuthResponse authResponse = authService.register(authRequest);
+    public ResponseEntity<AuthResponse> signup(@RequestBody @Valid AuthRequest authRequest) {
+        final String jwt = authService.register(authRequest);
+        AuthResponse authResponse = AuthResponse
+                .builder()
+                .token(jwt)
+                .build();
         return ResponseEntity.ok(authResponse);
     }
 
     @Operation(summary = "User login.")
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-        AuthResponse authResponse = authService.login(authRequest);
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest authRequest) {
+        final String jwt = authService.login(authRequest);
+        AuthResponse authResponse = AuthResponse
+                .builder()
+                .token(jwt)
+                .build();
         return ResponseEntity.ok(authResponse);
     }
 

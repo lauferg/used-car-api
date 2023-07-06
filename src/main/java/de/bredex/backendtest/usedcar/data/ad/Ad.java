@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -21,14 +20,14 @@ import java.math.BigDecimal;
 public class Ad {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private BigDecimal id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_user_email", referencedColumnName = "email")
     private ApplicationUser applicationUser;
     private String make;
     private String type;
     private String description;
-    private BigDecimal price;
+    private Long price;
 
 }

@@ -25,10 +25,8 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signup(@RequestBody @Valid AuthRequest authRequest) {
         final String jwt = authService.register(authRequest);
-        AuthResponse authResponse = AuthResponse
-                .builder()
-                .token(jwt)
-                .build();
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setToken(jwt);
         return ResponseEntity.ok(authResponse);
     }
 
@@ -36,10 +34,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest authRequest) {
         final String jwt = authService.login(authRequest);
-        AuthResponse authResponse = AuthResponse
-                .builder()
-                .token(jwt)
-                .build();
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setToken(jwt);
         return ResponseEntity.ok(authResponse);
     }
 

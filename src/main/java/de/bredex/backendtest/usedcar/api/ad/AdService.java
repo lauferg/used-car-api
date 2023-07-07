@@ -71,12 +71,11 @@ public class AdService {
     }
 
     private AdDto adDtoFromAdEntity(Ad adEntity) {
-        return AdDto
-                .builder()
-                .make(adEntity.getMake())
-                .type(adEntity.getType())
-                .description(adEntity.getDescription())
-                .price(adEntity.getPrice())
-                .build();
+        AdDto adDto = new AdDto();
+        adDto.setMake(adEntity.getMake());
+        adDto.setType(adEntity.getType());
+        adDto.setDescription(adEntity.getDescription());
+        adDto.setPrice(adEntity.getPrice());
+        return adDto;
     }
 }

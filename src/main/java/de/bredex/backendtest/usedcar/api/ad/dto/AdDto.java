@@ -1,13 +1,14 @@
 package de.bredex.backendtest.usedcar.api.ad.dto;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Size;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class AdDto {
     @Size(min = 1, max = 20, message = "The make of the car must be between 1 and 20 characters in length.")
     private String make;

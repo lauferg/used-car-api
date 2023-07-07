@@ -48,7 +48,7 @@ public class JwtTokenManager {
                 .findByApplicationUser(applicationUser)
                 .orElseThrow();
         token.setBlacklisted(true);
-        jwtTokenRepository.save(token);
+        jwtTokenRepository.saveAndFlush(token);
     }
 
     public void blacklistToken(String jwt) {
@@ -59,7 +59,7 @@ public class JwtTokenManager {
 
     private void setBlacklistedFlagAndStore(JwtToken token) {
         token.setBlacklisted(true);
-        jwtTokenRepository.save(token);
+        jwtTokenRepository.saveAndFlush(token);
     }
 
     private JwtToken issueNewToken(ApplicationUser applicationUser, Map<String, Object> extraClaims) {

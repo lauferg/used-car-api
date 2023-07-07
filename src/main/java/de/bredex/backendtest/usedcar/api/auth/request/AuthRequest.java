@@ -12,6 +12,6 @@ public class AuthRequest {
 
     @Size(min = 1, max = 50, message = "Name has to be between 1 and 50 characters in length.")
     private String name;
-    @Pattern(regexp = "^\\w+@\\w+\\.\\w+", message = "Email should be of a plausible email format.")
+    @Pattern(regexp = "^.+@.+\\..+", message = "Email should be of a plausible email format.")
     private String email;
 }

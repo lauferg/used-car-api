@@ -31,8 +31,8 @@ public class AuthService {
         );
 
         authenticationManager.authenticate(authToken);
-
         ApplicationUser applicationUser = applicationUserRepository.findByEmailAndName(userEmail, userName).orElseThrow();
+        SecurityContextHolder.getContext().setAuthentication(authToken);
         return jwtTokenManager.issueToken(applicationUser, Collections.emptyMap());
     }
 
